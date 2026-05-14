@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AgentFlow } from "@/components/AgentFlow";
+import { TechStackFlow } from "@/components/TechStackFlow";
 import {
   Brain,
   GitBranch,
