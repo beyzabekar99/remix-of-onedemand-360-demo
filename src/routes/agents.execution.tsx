@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { CityFilter } from "@/components/CityFilter";
 import { stores, opsStyle, opsLabel, fmtPct } from "@/lib/demo-data";
-import { PlayCircle, Truck, Store as StoreIcon, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { PlayCircle, Truck, Store as StoreIcon, ShieldCheck, ShieldAlert, ShieldX, Check, Loader2 } from "lucide-react";
 import { AgentBadge } from "./agents.forecast";
 
 export const Route = createFileRoute("/agents/execution")({
@@ -42,6 +42,8 @@ function ExecutionAgentPage() {
         subtitle="2 seviyeli guardrail · Picking KPI (mağaza) + Kurye KPI (havuz)"
         right={<AgentBadge icon={PlayCircle} label="KPI'lar tarandı" tone="info" />}
       />
+
+      <GuardrailProgress />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card label="Picking durumu (genel)" value={riskyStores === 0 ? "GREEN" : riskyStores > 1 ? "RED" : "YELLOW"} tone={riskyStores === 0 ? "success" : "warning"} />
@@ -178,11 +180,70 @@ function ExecutionAgentPage() {
 function Card({ label, value, tone = "default", icon: Icon }: { label: string; value: string; tone?: "default" | "success" | "danger" | "warning"; icon?: any }) {
   const cls = { default: "text-foreground", success: "text-success", danger: "text-danger", warning: "text-warning" }[tone];
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
+    <div className="od-card-hover rounded-xl border border-border bg-card/80 backdrop-blur-sm p-5">
       <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
         {Icon && <Icon className="h-3.5 w-3.5" />}{label}
       </div>
       <div className={`mt-2 text-xl font-semibold ${cls}`}>{value}</div>
+    </div>
+  );
+}
+
+function GuardrailProgress() {
+  const steps = [
+    "Picking KPI kontrol edildi",
+    "Kurye KPI kontrol edildi",
+    "Guardrail sonucu üretildi",
+  ];
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    if (step >= steps.length) return;
+    const t = setTimeout(() => setStep((s) => s + 1), 900);
+    return () => clearTimeout(t);
+  }, [step, steps.length]);
+
+  return (
+    <div className="mb-4 rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <span className="od-live-dot od-live-dot-orange" />
+          AI Guardrail Analizi
+        </div>
+        <button
+          onClick={() => setStep(0)}
+          className="text-[11px] text-muted-foreground hover:text-primary"
+        >
+          tekrar çalıştır
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {steps.map((label, i) => {
+          const done = i < step;
+          const running = i === step;
+          return (
+            <div
+              key={label}
+              className={[
+                "flex items-center gap-2 rounded-md border px-3 py-2 text-xs transition-all",
+                done
+                  ? "border-success/40 bg-success/10 text-success"
+                  : running
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-muted/40 text-muted-foreground",
+              ].join(" ")}
+            >
+              {done ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : running ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <span className="h-3.5 w-3.5 rounded-full border border-current" />
+              )}
+              <span className="font-medium">{label}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

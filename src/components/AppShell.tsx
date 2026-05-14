@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   LayoutGrid,
@@ -26,18 +26,22 @@ const nav = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
-      {/* ambient radial glow background */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(900px circle at 12% -10%, rgba(237,118,37,0.10), transparent 55%), radial-gradient(700px circle at 95% 8%, rgba(255,176,102,0.08), transparent 55%), radial-gradient(800px circle at 50% 110%, rgba(237,118,37,0.06), transparent 60%)",
-        }}
-      />
-
+      {/* ambient animated blobs */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <span className="od-blob od-blob-a" style={{ width: 520, height: 520, top: -160, left: -120 }} />
+        <span className="od-blob od-blob-b" style={{ width: 480, height: 480, top: -80, right: -140 }} />
+        <span className="od-blob od-blob-c" style={{ width: 600, height: 600, bottom: -220, left: "30%" }} />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(900px circle at 12% -10%, rgba(237,118,37,0.06), transparent 55%), radial-gradient(700px circle at 95% 8%, rgba(255,176,102,0.05), transparent 55%)",
+          }}
+        />
+      </div>
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar/80 backdrop-blur-xl text-sidebar-foreground md:flex">
         <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
           <Logo className="h-10 w-10 drop-shadow-[0_4px_12px_rgba(237,118,37,0.35)]" />
@@ -79,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <div className="p-6 max-w-7xl mx-auto">{children}</div>
+        <div key={pathname} className="od-page-enter p-6 max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );

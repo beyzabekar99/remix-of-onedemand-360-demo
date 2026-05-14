@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { CityFilter } from "@/components/CityFilter";
 import { stores, opsStyle, campaignStyle, approvalStyle, tierStyle, fmtMoney, fmtNum } from "@/lib/demo-data";
-import { Megaphone, Store as StoreIcon, Users, ShoppingBasket, ShieldCheck, Sparkles } from "lucide-react";
+import { Megaphone, Store as StoreIcon, Users, ShoppingBasket, ShieldCheck, Sparkles, Check, X, Send } from "lucide-react";
 import { AgentBadge } from "./agents.forecast";
 
 export const Route = createFileRoute("/agents/campaign")({
@@ -123,47 +124,126 @@ function CampaignAgentPage() {
 
       <h2 className="mt-8 mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Agent gerekçeleri</h2>
       <div className="grid gap-3 lg:grid-cols-2">
-        {filtered.map((r) => {
-          const c = r.campaign;
-          const disabled = c.approval === "Engellendi";
-          return (
-            <div key={r.store} className={`rounded-xl border p-4 ${disabled ? "border-danger/40 bg-danger/5" : "border-border bg-card"}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{r.store} · {r.city}</div>
-                  <div className="mt-1 text-sm font-semibold flex items-center gap-2 flex-wrap">
-                    <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${campaignStyle[c.type]}`}>{c.type}</span>
-                    {c.couponTier ?? c.offer}
-                  </div>
-                </div>
-                <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${opsStyle[r.opsStatus]}`}>
-                  <ShieldCheck className="h-3 w-3 mr-1" />{r.opsStatus}
-                </span>
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground leading-relaxed">{c.rationale}</div>
-              <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
-                <div className="text-[11px] text-muted-foreground flex items-center gap-3">
-                  <span><ShoppingBasket className="inline h-3 w-3 mr-1" />Min sepet {c.minBasket > 0 ? `${c.minBasket} ₺` : "—"}</span>
-                  {c.type !== "Yok" && (
-                    <span><Users className="inline h-3 w-3 mr-1" />{fmtNum(r.reachableUsers)} reachable</span>
-                  )}
-                </div>
-                {c.creative ? (
-                  <Link
-                    to="/agents/creative"
-                    className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20"
-                  >
-                    <Sparkles className="h-3 w-3" /> Creative öner
-                  </Link>
-                ) : (
-                  <span className="text-[11px] text-muted-foreground">Creative yok</span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {filtered.map((r) => (
+          <CampaignRationaleCard key={r.store} r={r} />
+        ))}
       </div>
     </AppShell>
+  );
+}
+
+function CampaignRationaleCard({ r }: { r: (typeof stores)[number] }) {
+  const c = r.campaign;
+  const blocked = r.opsStatus === "RED" || c.approval === "Engellendi";
+  const noCamp = c.type === "Yok";
+  const [status, setStatus] = useState<"pending" | "approved" | "rejected" | "sent">("pending");
+
+  const onApprove = () => {
+    if (blocked || noCamp) return;
+    setStatus("approved");
+    toast.success("Kampanya önerisi onaylandı", {
+      description: `${r.store} · ${c.type} · beklenen net katkı ${fmtMoney(c.netContribution)}`,
+    });
+  };
+  const onReject = () => {
+    if (noCamp) return;
+    setStatus("rejected");
+    toast(`${r.store} için öneri reddedildi`, { description: "Geri besleme Campaign Agent'a iletildi." });
+  };
+  const onSend = () => {
+    if (blocked || noCamp) return;
+    setStatus("sent");
+    toast.success("Cockpit'e gönderildi", {
+      description: "Kampanya önerisi demo ortamında Cockpit'e gönderildi.",
+    });
+  };
+
+  return (
+    <div
+      className={`od-card-hover rounded-xl border p-4 ${
+        blocked ? "border-danger/40 bg-danger/5" : "border-border bg-card/80 backdrop-blur-sm"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            {r.store} · {r.city}
+          </div>
+          <div className="mt-1 text-sm font-semibold flex items-center gap-2 flex-wrap">
+            <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${campaignStyle[c.type]}`}>{c.type}</span>
+            {c.couponTier ?? c.offer}
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${opsStyle[r.opsStatus]}`}>
+            <ShieldCheck className="h-3 w-3 mr-1" />{r.opsStatus}
+          </span>
+          {status !== "pending" && (
+            <span
+              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium border ${
+                status === "approved"
+                  ? "border-success/40 bg-success/10 text-success"
+                  : status === "sent"
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-muted text-muted-foreground"
+              }`}
+            >
+              {status === "approved" && <Check className="h-3 w-3" />}
+              {status === "sent" && <Send className="h-3 w-3" />}
+              {status === "rejected" && <X className="h-3 w-3" />}
+              {status === "approved" ? "Onaylandı" : status === "sent" ? "Cockpit'e gönderildi" : "Reddedildi"}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground leading-relaxed">{c.rationale}</div>
+
+      <div className="mt-3 flex items-center justify-between gap-2 flex-wrap">
+        <div className="text-[11px] text-muted-foreground flex items-center gap-3">
+          <span><ShoppingBasket className="inline h-3 w-3 mr-1" />Min sepet {c.minBasket > 0 ? `${c.minBasket} ₺` : "—"}</span>
+          {c.type !== "Yok" && (
+            <span><Users className="inline h-3 w-3 mr-1" />{fmtNum(r.reachableUsers)} reachable</span>
+          )}
+        </div>
+        {c.creative ? (
+          <Link
+            to="/agents/creative"
+            className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
+          >
+            <Sparkles className="h-3 w-3" /> Creative öner
+          </Link>
+        ) : (
+          <span className="text-[11px] text-muted-foreground">Creative yok</span>
+        )}
+      </div>
+
+      {!noCamp && (
+        <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-end gap-2 flex-wrap">
+          <button
+            onClick={onReject}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium hover:bg-muted active:scale-95 transition-all"
+          >
+            <X className="h-3 w-3" /> Reddet
+          </button>
+          <button
+            onClick={onApprove}
+            disabled={blocked}
+            title={blocked ? "Operasyonel guardrail nedeniyle kampanya aksiyonu engellendi." : undefined}
+            className="inline-flex items-center gap-1 rounded-md border border-success/40 bg-success/10 px-2.5 py-1 text-xs font-medium text-success hover:bg-success/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-success/10"
+          >
+            <Check className="h-3 w-3" /> Onayla
+          </button>
+          <button
+            onClick={onSend}
+            disabled={blocked}
+            title={blocked ? "Operasyonel guardrail nedeniyle kampanya aksiyonu engellendi." : undefined}
+            className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#ED7625] to-[#B8470F] px-3 py-1 text-xs font-semibold text-white shadow-[0_4px_12px_-4px_rgba(237,118,37,0.6)] hover:shadow-[0_6px_18px_-4px_rgba(237,118,37,0.8)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+          >
+            <Send className="h-3 w-3" /> Cockpit Demo'ya Gönder
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
