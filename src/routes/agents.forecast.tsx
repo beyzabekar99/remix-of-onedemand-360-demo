@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { CityFilter } from "@/components/CityFilter";
-import { stores, fmtNum } from "@/lib/demo-data";
-import { Brain, TrendingUp, Users, Percent, Megaphone, CloudRain, PartyPopper, Store as StoreIcon } from "lucide-react";
+import { stores, fmtNum, fmtMoney } from "@/lib/demo-data";
+import { Brain, TrendingUp, Users, Percent, Megaphone, CloudRain, PartyPopper, Store as StoreIcon, Sun, Cloud, CloudSnow, Wind, Thermometer, Droplets, Tag, Gift, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/agents/forecast")({
   component: ForecastAgentPage,
