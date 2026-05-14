@@ -47,7 +47,7 @@ function Kpi({
 function Hero() {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-border p-6 md:p-8 text-white shadow-[0_20px_60px_-20px_rgba(237,118,37,0.45)]"
+      className="relative overflow-hidden rounded-2xl border border-border p-6 md:p-8 mb-6 text-white shadow-[0_20px_60px_-20px_rgba(237,118,37,0.45)]"
       style={{
         background: "linear-gradient(135deg, #ED7625 0%, #F39455 45%, #B8470F 100%)",
       }}
