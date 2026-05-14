@@ -16,12 +16,12 @@ export const Route = createFileRoute("/agents/forecast")({
 });
 
 const SIGNAL_LABELS = {
-  baseOrders: { label: "Baz sipariş", icon: TrendingUp },
-  activeCustomerImpact: { label: "Aktif müşteri etkisi", icon: Users },
-  crImpact: { label: "CR etkisi", icon: Percent },
-  campaignImpact: { label: "Kampanya etkisi", icon: Megaphone },
-  weatherImpact: { label: "Hava etkisi", icon: CloudRain },
-  specialDayImpact: { label: "Özel gün etkisi", icon: PartyPopper },
+  baseOrders: { label: "Baz sipariş", icon: TrendingUp, color: "from-slate-400 to-slate-700" },
+  activeCustomerImpact: { label: "Aktif müşteri etkisi", icon: Users, color: "from-cyan-400 to-blue-600" },
+  crImpact: { label: "CR etkisi", icon: Percent, color: "from-violet-400 to-fuchsia-600" },
+  campaignImpact: { label: "Kampanya etkisi", icon: Megaphone, color: "from-orange-400 to-red-500" },
+  weatherImpact: { label: "Hava etkisi", icon: CloudRain, color: "from-sky-400 to-indigo-600" },
+  specialDayImpact: { label: "Özel gün etkisi", icon: PartyPopper, color: "from-pink-400 to-rose-600" },
 } as const;
 
 function ForecastAgentPage() {
