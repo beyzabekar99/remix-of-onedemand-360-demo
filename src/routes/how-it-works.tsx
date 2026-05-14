@@ -150,38 +150,16 @@ function HowItWorksPage() {
         </div>
       </Card>
 
-      {/* Pipeline */}
+      {/* Animated agent flow diagram */}
       <div className="mb-8">
         <h3 className="text-lg font-semibold mb-4">Karar Akışı</h3>
-        <div className="grid lg:grid-cols-6 gap-3">
-          {agents.map((a, i) => (
-            <Link key={a.to} to={a.to} className="group">
-              <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-[0_12px_32px_-12px_rgba(237,118,37,0.45)] border-border/60 overflow-hidden">
-                <div className={`h-1 bg-gradient-to-r ${a.color}`} />
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`h-9 w-9 rounded-lg bg-gradient-to-br ${a.color} flex items-center justify-center text-white shadow-[0_6px_18px_-6px_rgba(237,118,37,0.6)]`}
-                    >
-                      <a.icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      0{i + 1}
-                    </span>
-                  </div>
-                  <div className="mt-3 text-sm font-semibold">{a.name}</div>
-                  <div className="mt-0.5 text-xs text-muted-foreground">{a.role}</div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-          Sinyal <ArrowRight className="h-3 w-3" /> Tahmin <ArrowRight className="h-3 w-3" />
-          Revize <ArrowRight className="h-3 w-3" /> Guardrail <ArrowRight className="h-3 w-3" />
-          Kampanya <ArrowRight className="h-3 w-3" /> Yaratıcı <ArrowRight className="h-3 w-3" />
-          Öğrenim
-        </div>
+        <AgentFlow />
+      </div>
+
+      {/* Tech stack stepper */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4">Teknoloji Seti</h3>
+        <TechStackFlow />
       </div>
 
       {/* Inputs */}
