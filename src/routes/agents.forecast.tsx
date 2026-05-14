@@ -227,3 +227,102 @@ export function AgentBadge({ icon: Icon, label, tone }: { icon: any; label: stri
     </span>
   );
 }
+
+// ---------- Weather mock by city ----------
+const WEATHER = [
+  { city: "İstanbul", icon: CloudRain, label: "Sağanak yağış", temp: 13, wind: 28, humid: 84, impact: "+%6 talep · ev içi tüketim", tone: "from-sky-400 to-indigo-600" },
+  { city: "Ankara",   icon: Cloud,     label: "Parçalı bulutlu", temp: 11, wind: 14, humid: 62, impact: "+%2 talep · stabil", tone: "from-slate-400 to-slate-600" },
+  { city: "İzmir",    icon: Sun,       label: "Açık & güneşli", temp: 19, wind: 10, humid: 48, impact: "−%1 talep · dışarı eğilimi", tone: "from-amber-300 to-orange-500" },
+  { city: "Bursa",    icon: CloudRain, label: "Hafif yağmur",   temp: 12, wind: 18, humid: 78, impact: "+%4 talep · grocery up", tone: "from-sky-400 to-blue-600" },
+  { city: "Antalya",  icon: Wind,      label: "Rüzgârlı sıcak", temp: 22, wind: 32, humid: 55, impact: "+%2 talep · içecek/snack", tone: "from-teal-400 to-emerald-600" },
+];
+
+function WeatherPanel() {
+  return (
+    <div className="rounded-xl border border-border bg-card/80 backdrop-blur-sm overflow-hidden">
+      <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div>
+          <div className="text-sm font-semibold flex items-center gap-2">
+            <CloudRain className="h-4 w-4 text-sky-500" /> Hava durumu sinyali
+          </div>
+          <div className="text-xs text-muted-foreground">5 şehir · forecast'e besleniyor</div>
+        </div>
+        <span className="text-[11px] text-muted-foreground">kaynak: WeatherAPI · 14:00</span>
+      </div>
+      <div className="divide-y divide-border/60">
+        {WEATHER.map((w) => {
+          const Icon = w.icon;
+          return (
+            <div key={w.city} className="flex items-center gap-3 px-5 py-3 hover:bg-accent/40 transition-colors">
+              <span className={`inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${w.tone} text-white shadow ring-1 ring-white/30`}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-semibold">{w.city}</div>
+                  <span className="text-[11px] text-muted-foreground">· {w.label}</span>
+                </div>
+                <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground tabular-nums">
+                  <span className="inline-flex items-center gap-1"><Thermometer className="h-3 w-3" />{w.temp}°C</span>
+                  <span className="inline-flex items-center gap-1"><Wind className="h-3 w-3" />{w.wind} km/s</span>
+                  <span className="inline-flex items-center gap-1"><Droplets className="h-3 w-3" />%{w.humid}</span>
+                </div>
+              </div>
+              <span className="text-[11px] font-medium rounded-md bg-sky-500/10 text-sky-600 px-2 py-0.5 shrink-0">
+                {w.impact}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ActiveCampaignsPanel({ filtered }: { filtered: typeof stores }) {
+  const active = filtered.filter((r) => r.campaign.type !== "Yok").slice(0, 6);
+  const total = active.reduce((s, r) => s + r.campaign.incrementalRevenue, 0);
+  return (
+    <div className="rounded-xl border border-border bg-card/80 backdrop-blur-sm overflow-hidden">
+      <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div>
+          <div className="text-sm font-semibold flex items-center gap-2">
+            <Megaphone className="h-4 w-4 text-orange-500" /> Aktif kampanyalar
+          </div>
+          <div className="text-xs text-muted-foreground">{active.length} mağaza · tahmini ek ciro {fmtMoney(total)}</div>
+        </div>
+        <span className="text-[11px] text-muted-foreground">forecast'e besleniyor</span>
+      </div>
+      <div className="divide-y divide-border/60">
+        {active.map((r) => {
+          const c = r.campaign;
+          const isCoupon = c.type === "Kupon";
+          const Icon = isCoupon ? Tag : c.type === "Ücretsiz Teslimat" ? Truck : Gift;
+          const tone = isCoupon ? "from-orange-400 to-red-500" : "from-emerald-400 to-teal-600";
+          return (
+            <div key={r.store} className="px-5 py-3 hover:bg-accent/40 transition-colors">
+              <div className="flex items-center gap-3">
+                <span className={`inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${tone} text-white shadow ring-1 ring-white/30 shrink-0`}>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="text-sm font-semibold truncate">{c.offer ?? c.type}</div>
+                    <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">{r.store}</span>
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">
+                    {r.city} · {r.tier} · min sepet {c.minBasket ? `${c.minBasket} TL` : "—"} · {c.approval}
+                  </div>
+                </div>
+                <div className="text-right shrink-0 tabular-nums">
+                  <div className="text-sm font-semibold text-success">+{fmtNum(c.incrementalOrders)} sipariş</div>
+                  <div className="text-[11px] text-muted-foreground">ROI {c.roi.toFixed(1)}x · {fmtMoney(c.incrementalRevenue)}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
