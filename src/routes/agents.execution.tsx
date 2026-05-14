@@ -43,6 +43,8 @@ function ExecutionAgentPage() {
         right={<AgentBadge icon={PlayCircle} label="KPI'lar tarandı" tone="info" />}
       />
 
+      <GuardrailProgress />
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card label="Picking durumu (genel)" value={riskyStores === 0 ? "GREEN" : riskyStores > 1 ? "RED" : "YELLOW"} tone={riskyStores === 0 ? "success" : "warning"} />
         <Card label="Kurye durumu (genel)" value={riskyPools === 0 ? "GREEN" : "YELLOW"} tone={riskyPools === 0 ? "success" : "warning"} />
