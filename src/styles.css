@@ -180,6 +180,10 @@
 @keyframes od-flow-dash {
   to { stroke-dashoffset: -40; }
 }
+@keyframes od-bar-grow {
+  from { width: 0%; }
+  to   { width: var(--target, 100%); }
+}
 
 .od-page-enter > * { opacity: 0; animation: od-fade-up 0.55s cubic-bezier(0.22,1,0.36,1) forwards; }
 .od-page-enter > *:nth-child(1) { animation-delay: 0.02s; }
