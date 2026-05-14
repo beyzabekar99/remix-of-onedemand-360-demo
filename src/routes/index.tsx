@@ -114,7 +114,7 @@ function Dashboard() {
         right={<CityFilter value={city} onChange={setCity} />}
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mt-2 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Kpi icon={TrendingUp} label="Toplam forecast" value={<CountUp value={totForecast} />} hint="Günlük plan" />
         <Kpi icon={Activity} label="Gerçekleşen" value={<CountUp value={totActual} />} hint={`Gün sonu: ${fmtNum(totEod)}`} />
         <Kpi icon={TrendingDown} label="Gap" value={<CountUp value={gap} decimals={1} suffix="%" />} tone={gap < -5 ? "danger" : gap < 0 ? "warning" : "success"} />
