@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <div className="p-6 max-w-7xl mx-auto">{children}</div>
+        <div key={pathname} className="od-page-enter p-6 max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );
