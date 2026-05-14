@@ -31,10 +31,10 @@ function SummaryPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {filtered.map((r) => (
-          <div key={r.store} className={`rounded-xl border p-5 ${
+          <div key={r.store} className={`od-card-hover rounded-xl border p-5 backdrop-blur-sm ${
             r.opsStatus === "RED" ? "border-danger/40 bg-danger/5"
             : r.opsStatus === "YELLOW" ? "border-warning/40 bg-warning/5"
-            : "border-border bg-card"
+            : "border-border bg-card/80"
           }`}>
             <div className="flex items-start justify-between gap-3">
               <div>

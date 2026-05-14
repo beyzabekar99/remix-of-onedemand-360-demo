@@ -92,9 +92,48 @@ function RevisionAgentPage() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 lg:grid-cols-2">
+      <h2 className="mt-8 mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Sinyal uyumları</h2>
+      <div className="grid gap-3 lg:grid-cols-3">
+        {[
+          { key: "weather", label: "Hava durumu uyumu", color: "from-sky-400 to-indigo-600" },
+          { key: "specialDay", label: "Özel gün uyumu", color: "from-pink-400 to-rose-600" },
+          { key: "campaign", label: "Kampanya uplift uyumu", color: "from-orange-400 to-red-500" },
+        ].map((s) => {
+          const total = filtered.length;
+          const ok = filtered.filter((r) =>
+            s.key === "weather" ? r.revision.weatherMatch : s.key === "specialDay" ? r.revision.specialDayMatch : r.revision.campaignMatch,
+          ).length;
+          const pct = total ? Math.round((ok / total) * 100) : 0;
+          return (
+            <div key={s.key} className="od-card-hover rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
+                <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${pct >= 80 ? "bg-success/15 text-success" : pct >= 50 ? "bg-warning/15 text-warning" : "bg-danger/15 text-danger"}`}>
+                  {ok}/{total} uyum
+                </span>
+              </div>
+              <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className={`h-full rounded-full bg-gradient-to-r ${s.color}`}
+                  style={{
+                    width: "0%",
+                    animation: "od-bar-grow 0.9s cubic-bezier(0.22,1,0.36,1) forwards",
+                    // @ts-ignore
+                    ["--target" as any]: `${pct}%`,
+                  }}
+                />
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">%{pct}</div>
+              <div className="text-[11px] text-muted-foreground">Beklenen vs gerçekleşen sinyal eşleşmesi</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <h2 className="mt-8 mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Agent yorumları</h2>
+      <div className="mt-2 grid gap-3 lg:grid-cols-2">
         {filtered.map((r) => (
-          <div key={r.store} className="rounded-xl border border-border bg-card p-4">
+          <div key={r.store} className="od-card-hover rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4">
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{r.store} · {r.city}</div>
             <div className="mt-1 text-sm leading-relaxed">{r.revision.comment}</div>
           </div>
