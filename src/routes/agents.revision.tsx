@@ -132,14 +132,89 @@ function RevisionAgentPage() {
 
       <h2 className="mt-8 mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">Agent yorumları</h2>
       <div className="mt-2 grid gap-3 lg:grid-cols-2">
-        {filtered.map((r) => (
-          <div key={r.store} className="od-card-hover rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">{r.store} · {r.city}</div>
-            <div className="mt-1 text-sm leading-relaxed">{r.revision.comment}</div>
-          </div>
-        ))}
+        {filtered.map((r) => {
+          const v = r.revision;
+          const tone =
+            v.deviationPct < -10 ? "danger" :
+            v.deviationPct < -5 ? "warning" :
+            v.deviationPct < 0 ? "info" : "success";
+          const toneCls = {
+            danger: { ring: "ring-danger/30", chip: "bg-danger/15 text-danger", bar: "from-rose-500 to-red-700", label: "Kritik sapma" },
+            warning: { ring: "ring-warning/30", chip: "bg-warning/15 text-warning", bar: "from-amber-400 to-orange-600", label: "Uyarı" },
+            info: { ring: "ring-primary/20", chip: "bg-primary/10 text-primary", bar: "from-cyan-400 to-teal-600", label: "İzleniyor" },
+            success: { ring: "ring-success/30", chip: "bg-success/15 text-success", bar: "from-emerald-400 to-green-600", label: "Stabil" },
+          }[tone];
+          return (
+            <div
+              key={r.store}
+              className={`od-card-hover relative overflow-hidden rounded-xl border border-border bg-card/80 backdrop-blur-sm p-4 ring-1 ${toneCls.ring}`}
+            >
+              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${toneCls.bar}`} />
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <StoreIcon className="h-3.5 w-3.5 text-primary" />
+                    <div className="text-sm font-semibold truncate">{r.store}</div>
+                    <span className="text-[10px] text-muted-foreground">· {r.city} · {r.tier}</span>
+                  </div>
+                  <div className="mt-1 text-[11px] text-muted-foreground">Revision Agent · {r.hour}</div>
+                </div>
+                <span className={`shrink-0 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${toneCls.chip}`}>
+                  {toneCls.label}
+                </span>
+              </div>
+
+              <p className="mt-3 text-sm leading-relaxed text-foreground/90">
+                <span className="text-muted-foreground">“</span>{v.comment}<span className="text-muted-foreground">”</span>
+              </p>
+
+              <div className="mt-3 grid grid-cols-3 gap-2 text-[11px]">
+                <div className="rounded-md border border-border/60 bg-muted/30 px-2 py-1.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Sapma</div>
+                  <div className={`mt-0.5 font-semibold tabular-nums ${v.deviationPct < 0 ? "text-danger" : "text-success"}`}>
+                    {fmtPct(v.deviationPct)}
+                  </div>
+                </div>
+                <div className="rounded-md border border-border/60 bg-muted/30 px-2 py-1.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Revize</div>
+                  <div className="mt-0.5 font-semibold tabular-nums">{fmtNum(v.revisedForecast)}</div>
+                </div>
+                <div className="rounded-md border border-border/60 bg-muted/30 px-2 py-1.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Telafi</div>
+                  <div className={`mt-0.5 font-semibold tabular-nums ${v.ordersToRecover > 0 ? "text-warning" : "text-muted-foreground"}`}>
+                    {v.ordersToRecover > 0 ? `+${fmtNum(v.ordersToRecover)}` : "—"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-1.5 flex-wrap">
+                <SignalChip ok={v.weatherMatch} label="Hava" />
+                <SignalChip ok={v.specialDayMatch} label="Özel gün" />
+                <SignalChip ok={v.campaignMatch} label="Kampanya" />
+                <span className="ml-auto text-[11px] text-muted-foreground">
+                  CR <span className="tabular-nums">%{v.expectedCr.toFixed(1)} → %{v.actualCr.toFixed(1)}</span>
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </AppShell>
+  );
+}
+
+function SignalChip({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
+        ok
+          ? "border-success/30 bg-success/10 text-success"
+          : "border-danger/30 bg-danger/10 text-danger"
+      }`}
+    >
+      {ok ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+      {label}
+    </span>
   );
 }
 

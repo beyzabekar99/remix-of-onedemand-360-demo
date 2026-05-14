@@ -47,7 +47,7 @@ function Kpi({
 function Hero() {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-border p-6 md:p-8 text-white shadow-[0_20px_60px_-20px_rgba(237,118,37,0.45)]"
+      className="relative overflow-hidden rounded-2xl border border-border p-6 md:p-8 mb-6 text-white shadow-[0_20px_60px_-20px_rgba(237,118,37,0.45)]"
       style={{
         background: "linear-gradient(135deg, #ED7625 0%, #F39455 45%, #B8470F 100%)",
       }}
@@ -114,7 +114,7 @@ function Dashboard() {
         right={<CityFilter value={city} onChange={setCity} />}
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mt-2 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Kpi icon={TrendingUp} label="Toplam forecast" value={<CountUp value={totForecast} />} hint="Günlük plan" />
         <Kpi icon={Activity} label="Gerçekleşen" value={<CountUp value={totActual} />} hint={`Gün sonu: ${fmtNum(totEod)}`} />
         <Kpi icon={TrendingDown} label="Gap" value={<CountUp value={gap} decimals={1} suffix="%" />} tone={gap < -5 ? "danger" : gap < 0 ? "warning" : "success"} />
@@ -122,7 +122,7 @@ function Dashboard() {
         <Kpi icon={Wallet} label="Beklenen ek ciro" value={<CountUp value={totIncRev} format={(n) => fmtMoney(n)} />} tone="success" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Kpi icon={Percent} label="Ortalama CR" value={<CountUp value={avgCr} decimals={2} prefix="%" />} />
         <Kpi icon={TrendingUp} label="Ortalama ROI" value={avgRoi > 0 ? <CountUp value={avgRoi} decimals={1} suffix="x" /> : "—"} />
         <Kpi icon={ShieldCheck} label="GREEN mağaza" value={<CountUp value={green} />} tone="success" />
@@ -130,7 +130,7 @@ function Dashboard() {
         <Kpi icon={ShieldX} label="RED mağaza" value={<CountUp value={red} />} tone="danger" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="mt-8 grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-xl border border-border bg-card/80 backdrop-blur-sm overflow-hidden">
           <div className="border-b border-border px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
             <div>
