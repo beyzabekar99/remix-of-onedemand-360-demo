@@ -51,6 +51,29 @@ function ForecastAgentPage() {
         <Card label="Hava + özel gün" value={`+${fmtNum(totalWeather + totalSpecial)}`} tone="success" />
       </div>
 
+      {/* Decomposition waterfall */}
+      <div className="mt-6 rounded-xl border border-border bg-card/80 backdrop-blur-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="text-sm font-semibold">Forecast Decomposition · waterfall</div>
+            <div className="text-xs text-muted-foreground">
+              Her sinyalin toplam forecast'e katkısı (animasyonlu)
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className="od-live-dot od-live-dot-orange" /> canlı analiz
+          </span>
+        </div>
+        <DecompositionBars
+          rows={(Object.keys(SIGNAL_LABELS) as Array<keyof typeof SIGNAL_LABELS>).map((k) => ({
+            key: k,
+            ...SIGNAL_LABELS[k],
+            value: filtered.reduce((s, r) => s + r.forecast[k], 0),
+          }))}
+          total={totalForecast}
+        />
+      </div>
+
       <div className="mt-6 rounded-xl border border-border bg-card overflow-hidden">
         <div className="border-b border-border px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
           <div>
