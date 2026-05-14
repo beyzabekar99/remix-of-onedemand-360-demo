@@ -130,7 +130,7 @@ function Dashboard() {
         <Kpi icon={ShieldX} label="RED mağaza" value={<CountUp value={red} />} tone="danger" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="mt-8 grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-xl border border-border bg-card/80 backdrop-blur-sm overflow-hidden">
           <div className="border-b border-border px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
             <div>
