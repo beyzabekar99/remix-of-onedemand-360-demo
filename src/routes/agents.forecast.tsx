@@ -74,6 +74,12 @@ function ForecastAgentPage() {
         />
       </div>
 
+      {/* Weather + Active campaigns detail */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <WeatherPanel />
+        <ActiveCampaignsPanel filtered={filtered} />
+      </div>
+
       <div className="mt-6 rounded-xl border border-border bg-card overflow-hidden">
         <div className="border-b border-border px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
           <div>
