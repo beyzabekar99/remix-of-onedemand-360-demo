@@ -122,7 +122,7 @@ function Dashboard() {
         <Kpi icon={Wallet} label="Beklenen ek ciro" value={<CountUp value={totIncRev} format={(n) => fmtMoney(n)} />} tone="success" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Kpi icon={Percent} label="Ortalama CR" value={<CountUp value={avgCr} decimals={2} prefix="%" />} />
         <Kpi icon={TrendingUp} label="Ortalama ROI" value={avgRoi > 0 ? <CountUp value={avgRoi} decimals={1} suffix="x" /> : "—"} />
         <Kpi icon={ShieldCheck} label="GREEN mağaza" value={<CountUp value={green} />} tone="success" />
