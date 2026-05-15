@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { PasswordGate } from "@/components/PasswordGate";
 
 import appCss from "../styles.css?url";
 
@@ -114,7 +115,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <PasswordGate>
+        <Outlet />
+      </PasswordGate>
       <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
