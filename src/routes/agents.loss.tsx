@@ -33,10 +33,10 @@ type Priority = "Yüksek" | "Orta" | "Düşük";
 const AVG_BASKET = 750; // TL
 
 const distribution: { key: Category; label: string; orders: number; share: number; color: string; owner: string }[] = [
-  { key: "Picking", label: "Picking kaynaklı", orders: 89, share: 36, color: "#dc2626", owner: "Mağaza Operasyon" },
-  { key: "Kurye", label: "Kurye kaynaklı", orders: 112, share: 45, color: "#f97316", owner: "Kurye Planlama" },
-  { key: "Kampanya", label: "Kampanya kaynaklı", orders: 31, share: 13, color: "#eab308", owner: "CRM / Kampanya" },
-  { key: "Talep", label: "Talep bariyeri", orders: 15, share: 6, color: "#6b7280", owner: "Büyüme / Ürün" },
+  { key: "Picking", label: "Picking Kaynaklı", orders: 89, share: 36, color: "#dc2626", owner: "Mağaza Operasyon" },
+  { key: "Kurye", label: "Kurye Kaynaklı", orders: 112, share: 45, color: "#f97316", owner: "Kurye Planlama" },
+  { key: "Kampanya", label: "Kampanya Kaynaklı", orders: 31, share: 13, color: "#eab308", owner: "CRM / Kampanya" },
+  { key: "Talep", label: "Talep Bariyeri", orders: 15, share: 6, color: "#6b7280", owner: "Büyüme / Ürün" },
 ];
 
 const totalOrders = distribution.reduce((s, d) => s + d.orders, 0);
@@ -89,7 +89,7 @@ function CategoryBadge({ c }: { c: Category }) {
     Picking: "Picking",
     Kurye: "Kurye",
     Kampanya: "Kampanya",
-    Talep: "Talep bariyeri",
+    Talep: "Talep Bariyeri",
   };
   return <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${map[c]}`}>{label[c]}</span>;
 }
