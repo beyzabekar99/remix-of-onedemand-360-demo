@@ -4,8 +4,10 @@ import { toast } from "sonner";
 import { AppShell, PageHeader } from "@/components/AppShell";
 import { CityFilter } from "@/components/CityFilter";
 import { stores, opsStyle, campaignStyle, approvalStyle, tierStyle, fmtMoney, fmtNum } from "@/lib/demo-data";
-import { Megaphone, Store as StoreIcon, Users, ShoppingBasket, ShieldCheck, Sparkles, Check, X, Send } from "lucide-react";
+import { Megaphone, Store as StoreIcon, Users, ShoppingBasket, ShieldCheck, Sparkles, Check, X, Send, AlertTriangle, Eye, Clock } from "lucide-react";
 import { AgentBadge } from "./agents.forecast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/agents/campaign")({
   component: CampaignAgentPage,
