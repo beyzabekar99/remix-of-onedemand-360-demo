@@ -3,7 +3,7 @@ import { Logo } from "./Logo";
 import { Lock } from "lucide-react";
 
 const STORAGE_KEY = "od360_auth";
-const PASSWORD = "migros2026";
+const PASSWORD = "migros2024";
 
 export function PasswordGate({ children }: { children: ReactNode }) {
   const [unlocked, setUnlocked] = useState(false);
@@ -57,7 +57,10 @@ export function PasswordGate({ children }: { children: ReactNode }) {
               autoFocus
               type="password"
               value={value}
-              onChange={(e) => { setValue(e.target.value); setError(false); }}
+              onChange={(e) => {
+                setValue(e.target.value);
+                setError(false);
+              }}
               className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#ED7625]/40"
               placeholder="••••••••"
             />
