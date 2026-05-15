@@ -46,6 +46,8 @@ function CampaignAgentPage() {
         <Kpi label="Beklenen net katkı" value={fmtMoney(totalNet)} tone="success" />
       </div>
 
+      <ApprovalQueue items={filtered.filter((r) => r.campaign.approval === "İnsan onayı gerekli")} />
+
       <div className="mt-6 rounded-xl border border-border bg-card overflow-hidden">
         <div className="border-b border-border px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
           <div className="text-sm font-medium">Mağaza × kampanya önerileri</div>
