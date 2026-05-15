@@ -36,20 +36,28 @@ function buildSvg(store: StoreRow, c: CreativeAsset): string {
   const white = "#FFFFFF";
 
   // text wrapping for headline
-  const words = c.bannerHeadline.split(" ");
-  const lines: string[] = [];
-  let cur = "";
-  const max = 22;
-  words.forEach((w) => {
-    if ((cur + " " + w).trim().length > max) {
-      if (cur) lines.push(cur.trim());
-      cur = w;
-    } else cur = (cur + " " + w).trim();
-  });
-  if (cur) lines.push(cur);
-  const headlineLines = lines.slice(0, 3);
+  const wrap = (txt: string, maxChars: number, maxLines: number) => {
+    const words = txt.split(" ");
+    const out: string[] = [];
+    let cur = "";
+    words.forEach((w) => {
+      if ((cur + " " + w).trim().length > maxChars) {
+        if (cur) out.push(cur.trim());
+        cur = w;
+      } else cur = (cur + " " + w).trim();
+    });
+    if (cur) out.push(cur);
+    return out.slice(0, maxLines);
+  };
+  const headlineLines = wrap(c.bannerHeadline, 14, 3);
+  const sublineLines = wrap(c.bannerSub, 32, 2);
 
   const illustration = buildIllustration(c.bannerImage);
+
+  // Illustration drawn in original 660-1160 coords; scaled+translated to (820,110) box (320x410)
+  const illoScale = 0.64;
+  const illoTx = 820 - 660 * illoScale;
+  const illoTy = 110 - 60 * illoScale;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BANNER_W} ${BANNER_H}" width="${BANNER_W}" height="${BANNER_H}">
   <defs>
@@ -62,12 +70,12 @@ function buildSvg(store: StoreRow, c: CreativeAsset): string {
       <stop offset="100%" stop-color="${orangeDark}"/>
     </linearGradient>
     <clipPath id="illoClip">
-      <rect x="660" y="60" width="500" height="510" rx="32"/>
+      <rect x="820" y="110" width="320" height="410" rx="28"/>
     </clipPath>
   </defs>
   <rect width="${BANNER_W}" height="${BANNER_H}" fill="url(#bg)"/>
-  <circle cx="${BANNER_W - 120}" cy="120" r="280" fill="${orange}" opacity="0.08"/>
-  <circle cx="${BANNER_W - 200}" cy="${BANNER_H - 200}" r="80" fill="${orangeDark}" opacity="0.12"/>
+  <circle cx="${BANNER_W - 120}" cy="120" r="280" fill="${orange}" opacity="0.06"/>
+  <circle cx="${BANNER_W - 200}" cy="${BANNER_H - 200}" r="80" fill="${orangeDark}" opacity="0.10"/>
   <rect x="0" y="0" width="14" height="${BANNER_H}" fill="url(#orangeGrad)"/>
   <g transform="translate(60, 60)">
     <rect width="180" height="44" rx="22" fill="${orange}"/>
@@ -77,16 +85,16 @@ function buildSvg(store: StoreRow, c: CreativeAsset): string {
     <rect width="${(store.store.length * 11) + 40}" height="34" rx="17" fill="${white}" stroke="${orange}" stroke-width="2"/>
     <text x="20" y="23" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="600" fill="${orange}">${escapeXml(store.store)}</text>
   </g>
-  ${headlineLines.map((ln, i) => `<text x="60" y="${260 + i * 78}" font-family="Inter, system-ui, sans-serif" font-size="64" font-weight="800" fill="${ink}" letter-spacing="-1.5">${escapeXml(ln)}</text>`).join("\n")}
-  <text x="60" y="${260 + headlineLines.length * 78 + 36}" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="500" fill="${ink}" opacity="0.75">${escapeXml(c.bannerSub)}</text>
+  ${headlineLines.map((ln, i) => `<text x="60" y="${250 + i * 70}" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="800" fill="${ink}" letter-spacing="-1.4">${escapeXml(ln)}</text>`).join("\n")}
+  ${sublineLines.map((ln, i) => `<text x="60" y="${250 + headlineLines.length * 70 + 32 + i * 28}" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" fill="${ink}" opacity="0.75">${escapeXml(ln)}</text>`).join("\n")}
   <g transform="translate(60, ${BANNER_H - 110})">
     <rect width="${(c.bannerCta.length * 14) + 60}" height="64" rx="32" fill="${orange}"/>
     <text x="${((c.bannerCta.length * 14) + 60) / 2}" y="42" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="${white}" text-anchor="middle">${escapeXml(c.bannerCta)} →</text>
   </g>
-  <g clip-path="url(#illoClip)">
+  <g clip-path="url(#illoClip)" transform="translate(${illoTx} ${illoTy}) scale(${illoScale})">
     ${illustration}
   </g>
-  <rect x="660" y="60" width="500" height="510" rx="32" fill="none" stroke="${orange}" stroke-opacity="0.25" stroke-width="2"/>
+  <rect x="820" y="110" width="320" height="410" rx="28" fill="none" stroke="${orange}" stroke-opacity="0.25" stroke-width="2"/>
 </svg>`;
 }
 
