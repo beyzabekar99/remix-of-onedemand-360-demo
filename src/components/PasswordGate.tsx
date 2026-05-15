@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode, type FormEvent } from "react";
 import { Logo } from "./Logo";
 import { Lock } from "lucide-react";
 
-const STORAGE_KEY = "od360_auth";
+const STORAGE_KEY = "od360_auth_v2";
 const PASSWORD = "migros2024";
 
 export function PasswordGate({ children }: { children: ReactNode }) {
@@ -23,7 +23,7 @@ export function PasswordGate({ children }: { children: ReactNode }) {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (value === PASSWORD) {
+    if (value.trim() === PASSWORD) {
       sessionStorage.setItem(STORAGE_KEY, "1");
       setUnlocked(true);
     } else {
