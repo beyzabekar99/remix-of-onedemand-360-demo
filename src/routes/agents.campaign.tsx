@@ -260,3 +260,176 @@ function Kpi({ label, value, tone }: { label: string; value: string; tone: "succ
     </div>
   );
 }
+
+type Decision = "pending" | "approved" | "rejected";
+
+function ApprovalQueue({ items }: { items: typeof stores }) {
+  const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [reviewing, setReviewing] = useState<(typeof stores)[number] | null>(null);
+  const [note, setNote] = useState("");
+
+  const pending = items.filter((r) => (decisions[r.store] ?? "pending") === "pending");
+  const decidedCount = items.length - pending.length;
+
+  const decide = (store: string, decision: Decision, label: string, desc?: string) => {
+    setDecisions((d) => ({ ...d, [store]: decision }));
+    if (decision === "approved") toast.success(label, { description: desc });
+    else toast(label, { description: desc });
+  };
+
+  const handleApprove = (r: (typeof stores)[number]) => {
+    decide(r.store, "approved", `${r.store} · kampanya onaylandı`,
+      `${r.campaign.type} · net katkı ${fmtMoney(r.campaign.netContribution)} · Cockpit kuyruğuna alındı.`);
+  };
+  const handleReject = (r: (typeof stores)[number]) => {
+    decide(r.store, "rejected", `${r.store} · öneri reddedildi`,
+      note ? `Not: ${note}` : "Geri besleme Campaign Agent'a iletildi.");
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-6 rounded-xl border border-warning/40 bg-warning/5 overflow-hidden">
+      <div className="border-b border-warning/30 bg-warning/10 px-5 py-3 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 text-sm font-semibold text-warning">
+          <AlertTriangle className="h-4 w-4" />
+          İnsan onayı bekleyen kampanyalar
+          <span className="rounded-full bg-warning/20 px-2 py-0.5 text-[11px] font-bold text-warning">{pending.length}</span>
+        </div>
+        <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          {decidedCount > 0 ? `${decidedCount} karar verildi · ` : ""}eşik üstü etki / guardrail yakınlığı nedeniyle manuel onay gerekiyor
+        </div>
+      </div>
+
+      <ul className="divide-y divide-warning/20">
+        {items.map((r) => {
+          const c = r.campaign;
+          const dec = decisions[r.store] ?? "pending";
+          return (
+            <li key={r.store} className="px-5 py-3 flex items-center gap-3 flex-wrap">
+              <div className="flex-1 min-w-[220px]">
+                <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
+                  <StoreIcon className="h-3.5 w-3.5 text-primary" />
+                  {r.store}
+                  <span className="text-xs text-muted-foreground">· {r.city}</span>
+                  <span className={`inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold ${tierStyle[r.tier]}`}>{r.tier}</span>
+                  <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${campaignStyle[c.type]}`}>{c.type}</span>
+                  <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${opsStyle[r.opsStatus]}`}>{r.opsStatus}</span>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {c.couponTier ? `${c.couponTier} · ` : ""}{c.offer} · {fmtNum(r.reachableUsers)} reachable · net katkı <span className="text-success font-medium">{fmtMoney(c.netContribution)}</span>
+                </div>
+              </div>
+
+              {dec === "pending" ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => { setReviewing(r); setNote(""); }}
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium hover:bg-muted transition-colors"
+                  >
+                    <Eye className="h-3 w-3" /> Detay
+                  </button>
+                  <button
+                    onClick={() => handleReject(r)}
+                    className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium hover:bg-muted transition-colors"
+                  >
+                    <X className="h-3 w-3" /> Reddet
+                  </button>
+                  <button
+                    onClick={() => handleApprove(r)}
+                    className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#ED7625] to-[#B8470F] px-3 py-1 text-xs font-semibold text-white shadow-[0_4px_12px_-4px_rgba(237,118,37,0.6)] hover:shadow-[0_6px_18px_-4px_rgba(237,118,37,0.8)] active:scale-95 transition-all"
+                  >
+                    <Check className="h-3 w-3" /> Onayla & gönder
+                  </button>
+                </div>
+              ) : (
+                <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium ${
+                  dec === "approved" ? "border-success/40 bg-success/10 text-success" : "border-border bg-muted text-muted-foreground"
+                }`}>
+                  {dec === "approved" ? <><Check className="h-3 w-3" />Onaylandı · Cockpit'e gönderildi</> : <><X className="h-3 w-3" />Reddedildi</>}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      <Dialog open={!!reviewing} onOpenChange={(o) => !o && setReviewing(null)}>
+        <DialogContent className="max-w-xl">
+          {reviewing && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-warning" />
+                  Onay incelemesi · {reviewing.store}
+                </DialogTitle>
+                <DialogDescription>
+                  Agent gerekçesi, beklenen etki ve operasyon guardrail'ı kontrol edip kararınızı verin.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex flex-wrap gap-2">
+                  <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${campaignStyle[reviewing.campaign.type]}`}>{reviewing.campaign.type}</span>
+                  <span className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium ${opsStyle[reviewing.opsStatus]}`}>Ops {reviewing.opsStatus}</span>
+                  <span className={`inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold ${tierStyle[reviewing.tier]}`}>{reviewing.tier}</span>
+                </div>
+
+                <div className="rounded-md border border-border bg-card/60 p-3 text-xs leading-relaxed text-muted-foreground">
+                  {reviewing.campaign.rationale}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <Stat label="Reachable" value={fmtNum(reviewing.reachableUsers)} />
+                  <Stat label="Min. sepet" value={reviewing.campaign.minBasket > 0 ? `${reviewing.campaign.minBasket} ₺` : "—"} />
+                  <Stat label="Ek sipariş" value={`+${fmtNum(reviewing.campaign.incrementalOrders)}`} />
+                  <Stat label="Ek ciro" value={fmtMoney(reviewing.campaign.incrementalRevenue)} />
+                  <Stat label="CR etki" value={`+${reviewing.campaign.crImpactPct.toFixed(1)} pp`} />
+                  <Stat label="ROI" value={`${reviewing.campaign.roi.toFixed(1)}x`} />
+                  <Stat label="Net katkı" value={fmtMoney(reviewing.campaign.netContribution)} highlight />
+                  <Stat label="Teklif" value={reviewing.campaign.offer} />
+                </div>
+
+                <div>
+                  <label className="text-[11px] uppercase tracking-wider text-muted-foreground">Karar notu (opsiyonel)</label>
+                  <Textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Onay/red gerekçesi, ek koşullar veya geri besleme..."
+                    className="mt-1 min-h-[72px] text-xs"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2">
+                <button
+                  onClick={() => { handleReject(reviewing); setReviewing(null); }}
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
+                >
+                  <X className="h-3 w-3" /> Reddet
+                </button>
+                <button
+                  onClick={() => { handleApprove(reviewing); setReviewing(null); }}
+                  className="inline-flex items-center gap-1 rounded-md bg-gradient-to-r from-[#ED7625] to-[#B8470F] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_12px_-4px_rgba(237,118,37,0.6)] hover:shadow-[0_6px_18px_-4px_rgba(237,118,37,0.8)] active:scale-95 transition-all"
+                >
+                  <Check className="h-3 w-3" /> Onayla & Cockpit'e gönder
+                </button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
+
+function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="rounded-md border border-border bg-card/60 px-2 py-1.5">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className={`text-xs font-medium tabular-nums ${highlight ? "text-success" : ""}`}>{value}</div>
+    </div>
+  );
+}
+
